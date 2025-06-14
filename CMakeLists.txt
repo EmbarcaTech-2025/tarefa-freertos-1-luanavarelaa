@@ -1,57 +1,56 @@
-# == DO NOT EDIT THE FOLLOWING LINES for the Raspberry Pi Pico VS Code Extension to work ==
+# Generated Cmake Pico project file
+
+cmake_minimum_required(VERSION 3.13)
+
 if(WIN32)
     set(USERHOME $ENV{USERPROFILE})
 else()
     set(USERHOME $ENV{HOME})
 endif()
-set(sdkVersion 2.1.1)
+set(sdkVersion 1.5.1)
 set(toolchainVersion 14_2_Rel1)
-set(picotoolVersion 2.1.1)
+set(picotoolVersion 2.0.0)
 set(picoVscode ${USERHOME}/.pico-sdk/cmake/pico-vscode.cmake)
 if (EXISTS ${picoVscode})
     include(${picoVscode})
 endif()
 # ====================================================================================
-set(PICO_BOARD pico CACHE STRING "Board type")
 
-cmake_minimum_required(VERSION 3.12)
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 
-# Set any variables required for importing libraries
-if (DEFINED ENV{FREERTOS_PATH})
-  SET(FREERTOS_PATH $ENV{FREERTOS_PATH})
-else()
-  SET(FREERTOS_PATH ${CMAKE_CURRENT_LIST_DIR}/FreeRTOS-Kernel)
-endif()
+set(PICO_BOARD pico_w CACHE STRING "Board type")
 
+# Define o caminho para a pasta do FreeRTOS
+SET(FREERTOS_PATH ${CMAKE_CURRENT_LIST_DIR}/FreeRTOS)
 message("FreeRTOS Kernel located in ${FREERTOS_PATH}")
 
-# Import those libraries
+# Importa o pico-sdk e o FreeRTOS
 include(pico_sdk_import.cmake)
 include(${FREERTOS_PATH}/portable/ThirdParty/GCC/RP2040/FreeRTOS_Kernel_import.cmake)
 
-# Define project
-project(embarcatech-freertos-tarefa-1 C CXX ASM)
 
-# Initialize the Raspberry Pi Pico SDK
+project(Tarefa_1_RTOS C CXX ASM)
+
 pico_sdk_init()
 
-add_executable(embarcatech-freertos-tarefa-1
-    main.c
+add_executable(Tarefa_1_RTOS
+        src/main.c
+        src/controle_led.c
+        src/controle_buzzer.c
+        src/controle_botao.c
 )
 
-target_include_directories(embarcatech-freertos-tarefa-1 PRIVATE
-    ${CMAKE_CURRENT_LIST_DIR}
-    ${CMAKE_CURRENT_LIST_DIR}/include
+
+target_link_libraries(Tarefa_1_RTOS
+        pico_stdlib
+        hardware_pwm 
+        FreeRTOS-Kernel-Heap4
 )
 
-target_link_libraries(embarcatech-freertos-tarefa-1 
-    pico_stdlib 
-    FreeRTOS-Kernel-Heap4 
-    hardware_i2c
-    )
+target_include_directories(Tarefa_1_RTOS PRIVATE
+        ${CMAKE_CURRENT_LIST_DIR}/include
+)
 
-pico_add_extra_outputs(embarcatech-freertos-tarefa-1)
-
-# if you have anything in "lib" folder then uncomment below - remember to add a CMakeLists.txt
-# file to the "lib" directory
-#add_subdirectory(lib)
+pico_enable_stdio_usb(Tarefa_1_RTOS 1)
+pico_add_extra_outputs(Tarefa_1_RTOS)
